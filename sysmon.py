@@ -4,83 +4,110 @@ import time
 import os
 import sys
 
-
-##str format
-CBEIGE  = '\33[36m' 
-CGREEN  = '\33[92m'
-CEND = '\033[0m'
-BOLD = '\033[1m'
-HEADER = '\033[95m'
-CRED = '\033[91m'
-
-#Outputs that dont change
-unamerData = subprocess.getoutput("uname -r")
-unameData = subprocess.getoutput("uname")
-unameoData = subprocess.getoutput("uname -o")
+#Text colors
+CBEIGE  = '\33[36m' #Beige
+CGREEN  = '\33[92m' #Green
 
 
+#Text styling
+BOLD = '\033[1m'    #Bold
+HEADER = '\033[95m' #Heading
 
-userNameData = subprocess.getoutput("echo $USER")
-hostNameData = subprocess.getoutput("hostname")
+#Other
+CEND = '\033[0m'    #End of text style
 
-try:
-    while True:
-        
-        
-        #get various system facts that do change
+#Prints system info
+def printer(mode, refreshTime):
 
-        uptimeData = subprocess.getoutput("uptime -p").replace("up","Uptime:")
+    try:
+            while True:
 
-        dateTimeData = subprocess.getoutput("date")
-        
-        diskData = subprocess.getoutput("df -h")
-        
-        ipAddrData = subprocess.getoutput("ip addr show | grep -i 'global'")
-        
-        cpuData = subprocess.getoutput("sensors | grep -i 'core'").replace("coretemp-isa-0000", "CPU:") 
-        gpuData = subprocess.getoutput("sensors | grep -i 'temp1:'")
-		
-        memData = subprocess.getoutput("free -h")
-        
+                #get system infomation
+
+                #get shell
+                shellData = subprocess.getoutput("echo $SHELL")
+                #uname outputs
+                unamerData = subprocess.getoutput("uname -r")
+                unameData = subprocess.getoutput("uname")
+                unameoData = subprocess.getoutput("uname -o")
+
+                #user and hostname outputs
+                userNameData = subprocess.getoutput("echo $USER")
+                hostNameData = subprocess.getoutput("hostname")
+
+                #uptime output
+                uptimeData = subprocess.getoutput("uptime -p").replace("up","Uptime:")
+
+                #date output
+                dateTimeData = subprocess.getoutput("date")
+
+                #system disk output
+                diskData = subprocess.getoutput("df -h")
+
+                #netwok info output
+                ipAddrData = subprocess.getoutput("ip addr show | grep -i 'global'")
+
+                # GPU and CPU temp data from lm_sensors
+                cpuData = subprocess.getoutput("sensors | grep -i 'core'").replace("coretemp-isa-0000", "CPU:")
+                gpuData = subprocess.getoutput("sensors | grep -i 'temp1:'")
+
+                memData = subprocess.getoutput("free -h")
+
+
+                os.system("clear")  #clear the terminal before printing to prevent flicker
+
+                # print the facts
+
+                print(HEADER +"sysmon v0.1\n")
+
+
+                print(HEADER + "Hello " + CEND + BOLD + userNameData + "\n")
+
+                print("Hostname: " + hostNameData + CEND + "\n")
+
+                print("Shell: " +shellData + "\n")
+
+                print("System summary: \n" + unameData + ", " + unamerData +  ", " + unameoData +", "  + dateTimeData + "\n")
+
+                print(uptimeData.replace(","," and") + "\n" + CEND)
+
+                print("Network:\n")
+
+                print(ipAddrData + "\n")
+
+                print(BOLD +"Disks:")
+
+                print(diskData + "\n")
+
+                print("Memory:\n")
+
+                print(memData + "\n"+ CEND)
+
+                print(CGREEN + cpuData + "\n" + CEND)
+
+                print(CBEIGE + "GPU:\n"  + gpuData + CEND)
+
+
+
+                if mode == 'p':     #Print info then exit mode
+                    sys.exit()
+                if refreshTime == 'r':
+                    time.sleep(refreshTime )    #sleep before refreshing system infomation
+
+
+    except KeyboardInterrupt:
         os.system("clear")
+        sys.exit()
 
-        # print the facts
-        
-        print(HEADER +"sysmon v0.1\n")
+def main():
+    if sys.argv[1] == "help":
+        print("Sample usage:\n\n sysmon r 1 - refreshing mode with a 1 second delay\n\n sysmon p - print info and exit\n\n\nsysmon v0.5")
 
-
-        print(HEADER + "Hello " + CEND + BOLD + userNameData + "\n")
-        print("Hostname: " + hostNameData + CEND + "\n")
-
-
-        print("System summary: \n" + unameData + ", " + unamerData +  ", " + unameoData +", "  + dateTimeData + "\n")
-
-        print(uptimeData.replace(","," and") + "\n" + CEND)
-
-        print("Network:\n")
-        print(ipAddrData + "\n")
-        
-        print(BOLD +"Disks:")
-        print(diskData + "\n")
-        
-        print("Memory:\n")
-
-        print(memData + "\n"+ CEND)
-
-        print(CGREEN + cpuData + "\n" + CEND)
-        
-        print(CBEIGE + "GPU:\n"  + gpuData + CEND)
-
-        
-        print( CRED +"\n\n\nControl + c to quit")
-
-        #sleep
-
-        time.sleep(2.5)
+    try:
+        printer(sys.argv[1], sys.argv[2])
+    except:
+        sys.exit()
 
 
-except KeyboardInterrupt:
-    print("\nExit by user" + CEND)
-    sys.exit()
-    
-
+if __name__== "__main__":
+  main()
