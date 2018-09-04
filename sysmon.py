@@ -17,7 +17,7 @@ HEADER = '\033[95m' #Heading
 CEND = '\033[0m'    #End of text style
 
 #Prints system info
-def printer(mode, refreshTime):
+def printer(mode, refreshTime = None):
 
     try:
             while True:
@@ -87,7 +87,7 @@ def printer(mode, refreshTime):
 
                 print(CBEIGE + "GPU:\n"  + gpuData + CEND)
 
-
+                sys.stdout.flush()
 
                 if mode == 'p':     #Print info then exit mode
                     sys.exit()
@@ -104,7 +104,10 @@ def main():
         print("Sample usage:\n\n sysmon r 1 - refreshing mode with a 1 second delay\n\n sysmon p - print info and exit\n\n\nsysmon v0.5")
 
     try:
-        printer(sys.argv[1], sys.argv[2])
+        if len(sys.argv) == 1:
+            printer(sys.argv[1])
+        else:
+            printer(sys.argv[1], sys.argv[2])
     except:
         sys.exit()
 
